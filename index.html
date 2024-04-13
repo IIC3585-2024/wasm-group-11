@@ -12,33 +12,34 @@
     <div id="resultado-wasm"></div>
     <div>Resultado con javascript</div>
     <div id="resultado-js"></div>
+    <input type="number" id="numero" name="Ingrese un número">
+    <button id="myButton">Ejecutar Función</button>
+    <script src="./factorizacion.js"></script>
+    <script>
+        document.getElementById('myButton').addEventListener('click', factorizarWasm);
+        function factorizarWasm () {
+                const numero = document.getElementById('numero').value;
+                    const startWasm = performance.now();
+                    const resultado_ptr = Module.ccall('factorizacionPrima', 'number', ['string'], [numero.toString()]);
+                    const endWasm = performance.now();
+                    const timeWasm = (endWasm - startWasm) / 1000;
+                    const result = Module.UTF8ToString(resultado_ptr);
+                    document.getElementById('resultado-wasm').innerText = result + '\nTiempo de ejecución: ' + timeWasm + ' segundos';
+                };
+    </script>
     <script src="./js_factorizacion.js"></script>
     <script>
-        const numero = 702001032428;
-        const startJs = performance.now();
-        (async () => {
-            const result = await new Promise((resolve, reject) => {
-                const result = factorizacionPrima(numero);
-                resolve(result);
-            });
+        const numero = document.getElementById('numero').value;
+        document.getElementById('myButton').addEventListener('click', factorizarJs);
+        function factorizarJs () {
+            const numero = document.getElementById('numero').value;
+            const startJs = performance.now();
+            const result = factorizacionPrima(numero);
             const endJs = performance.now();
             const timeJs = (endJs - startJs) / 1000;
             document.getElementById('resultado-js').innerText = result + '\nTiempo de ejecución: ' + timeJs + ' segundos';
-        })();
-    </script>
-    <script src="./factorizacion.js"></script>
-    <script>
-        Module.onRuntimeInitialized = async function() {
-            const startWasm = performance.now();
-            const resultado_ptr = await new Promise((resolve, reject) => {
-                const resultado_ptr = Module.ccall('factorizacionPrima', 'number', ['string'], [numero.toString()]);
-                resolve(resultado_ptr);
-            });
-            const endWasm = performance.now();
-            const result = Module.UTF8ToString(resultado_ptr);
-            const timeWasm = (endWasm - startWasm) / 1000;
-            document.getElementById('resultado-wasm').innerText = result + '\nTiempo de ejecución: ' + timeWasm + ' segundos';
         };
     </script>
+    
 </body>
 </html>

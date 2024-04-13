@@ -15,3 +15,6 @@ ejecutar para otras optimizaciones (O2 y O3 respectivamente):
 
 limpiar cache de emcc
 - ``emcc --clear-cache``
+
+bibliografia:
+https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#interacting-with-code-ccall-cwrap
