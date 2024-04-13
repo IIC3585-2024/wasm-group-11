@@ -1,0 +1,36 @@
+sudo service docker restart
+npm install @wasmer/wasi
+
+npm install -g http-server
+http-server
+
+
+# create helloworld.cpp
+cat << EOF > helloworld.cpp
+#include <iostream>
+int main() {
+  std::cout << "Hello World!" << std::endl;
+  return 0;
+}
+EOF
+
+
+# compile with docker image
+docker run \
+  --rm \
+  -v $(pwd):/src \
+  -u $(id -u):$(id -g) \
+  emscripten/emsdk \
+  emcc test.c -o test.js
+
+# execute on host machine
+node helloworld.js
+
+
+sin docker
+emcc helloworld.cpp -o test.html
+emcc hello_function.cpp -o function2.html -sEXPORTED_FUNCTIONS=_int_sqrt -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
+python3 -m http.server
+
+bibliografia:
+https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#interacting-with-code-ccall-cwrap
