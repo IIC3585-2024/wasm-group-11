@@ -12,7 +12,6 @@ function esPrimo(n) {
 
 function factorizacionPrima(n) {
   let divisor = 2;
-  console.log('js:', n);
   let result = "";
 
   while (n > 1) {

@@ -31,6 +31,7 @@ sin docker
 emcc helloworld.cpp -o test.html
 emcc hello_function.cpp -o function2.html -sEXPORTED_FUNCTIONS=_int_sqrt -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
 python3 -m http.server
+emcc --clear-cache
 
 bibliografia:
 https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#interacting-with-code-ccall-cwrap

@@ -3,44 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebAssembly Example</title>
+    <title>WebAssembly G11</title>
 </head>
 <body>
+    <div><h1>Index en tarea 2</h1></div>
+     
+    <div>Resultado con wasm</div>
     <div id="resultado-wasm"></div>
+    <div>Resultado con javascript</div>
     <div id="resultado-js"></div>
-    <script src="factorizacion.js"></script>
+    <script src="./js_factorizacion.js"></script>
     <script>
-        // const numero = 7086221232 00023;
-        const numero = 708622123200023; 
-        Module.onRuntimeInitialized = _ => {
-            const startWasm = performance.now();
-            const resultado_ptr = Module.ccall('factorizacionPrima', 'number', ['string'], [numero.toString()]);
-            const result = Module.UTF8ToString(resultado_ptr);
-            const endWasm = performance.now();
-            const timeWasm = (endWasm - startWasm) / 1000;
-            document.getElementById('resultado-wasm').innerText = 'El resultado de la función en C/C++ es: ' + result + '. Tiempo de ejecución: ' + timeWasm + ' segundos';
-        };
-    </script>
-    <script src="js_factorizacion.js"></script>
-    <script>
+        const numero = 702001032428;
         const startJs = performance.now();
-        const result = factorizacionPrima(numero);
-        const endJs = performance.now();
-        const timeJs = (endJs - startJs) / 1000;
-        document.getElementById('resultado-js').innerText = 'El resultado de la función en JavaScript es: ' + result + '. Tiempo de ejecución: ' + timeJs + ' segundos';
+        (async () => {
+            const result = await new Promise((resolve, reject) => {
+                const result = factorizacionPrima(numero);
+                resolve(result);
+            });
+            const endJs = performance.now();
+            const timeJs = (endJs - startJs) / 1000;
+            document.getElementById('resultado-js').innerText = result + '\nTiempo de ejecución: ' + timeJs + ' segundos';
+        })();
+    </script>
+    <script src="./factorizacion.js"></script>
+    <script>
+        Module.onRuntimeInitialized = async function() {
+            const startWasm = performance.now();
+            const resultado_ptr = await new Promise((resolve, reject) => {
+                const resultado_ptr = Module.ccall('factorizacionPrima', 'number', ['string'], [numero.toString()]);
+                resolve(resultado_ptr);
+            });
+            const endWasm = performance.now();
+            const result = Module.UTF8ToString(resultado_ptr);
+            const timeWasm = (endWasm - startWasm) / 1000;
+            document.getElementById('resultado-wasm').innerText = result + '\nTiempo de ejecución: ' + timeWasm + ' segundos';
+        };
     </script>
 </body>
 </html>
-
-<!-- var Module = {
-    print: (function() {
-      var element = document.getElementById('output');
-      return (...args) => {
-        var text = args.join(' ');
-        console.log(text);
-        if (element) {
-          element.value += text + "\n";
-        }
-      };
-    })(),
-  }; -->
