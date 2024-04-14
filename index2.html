@@ -23,7 +23,6 @@
         let labels = [];
         document.getElementById('chartReset').addEventListener('click', function() {           
             resultadosWasm = [];
-            resultadosWasmO2 = [];
             resultadosJs = [];
             labels = [];
             myChart.data.labels = labels;
@@ -32,36 +31,40 @@
             myChart.update();
         });
 
+        document.getElementById('myButton').addEventListener('click', function() {
+            // Limpiar los resultados anteriores
+            resultadosWasm = [];
+            resultadosJs = [];
+            labels = [];
 
-        document.getElementById('myButton').addEventListener('click', factorizarWasm);
-        function factorizarWasm () {
-                    const numero = document.getElementById('numero').value;
-                    const startWasm = performance.now();
-                    const resultado_ptr = Module.ccall('factorizacionPrima', 'number', ['string'], [numero.toString()]);
-                    const endWasm = performance.now();
-                    const timeWasm = (endWasm - startWasm) / 1000;
-                    const result = Module.UTF8ToString(resultado_ptr);
-                    document.getElementById('resultado-wasm').innerText = result + '\nTiempo de ejecución: ' + timeWasm + ' segundos';
-                    resultadosWasm.push(timeWasm);
-                    labels.push(resultadosWasm.length);
-                    myChart.update();
-                };
+            // Ejecutar las funciones 100 veces
+            for (let i = 0; i < 50; i++) {
+                // Ejecutar la función de WebAssembly
+                const numero = document.getElementById('numero').value;
+                const startWasm = performance.now();
+                const resultado_ptr = Module.ccall('factorizacionPrima', 'number', ['string'], [numero.toString()]);
+                const endWasm = performance.now();
+                const timeWasm = (endWasm - startWasm) / 1000;
+                resultadosWasm.push(timeWasm);
+                labels.push(i);
+
+                // Ejecutar la función de JavaScript
+                const startJs = performance.now();
+                const result = factorizacionPrima(numero);
+                const endJs = performance.now();
+                const timeJs = (endJs - startJs) / 1000;
+                resultadosJs.push(timeJs);
+                console.log('Iteración', i);
+            }
+
+            // Actualizar el gráfico
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = resultadosWasm;
+            myChart.data.datasets[1].data = resultadosJs;
+            myChart.update();
+        });
     </script>
     <script src="./js_factorizacion.js"></script>
-    <script>
-        const numero = document.getElementById('numero').value;
-        document.getElementById('myButton').addEventListener('click', factorizarJs);
-        function factorizarJs () {
-            const numero = document.getElementById('numero').value;
-            const startJs = performance.now();
-            const result = factorizacionPrima(numero);
-            const endJs = performance.now();
-            const timeJs = (endJs - startJs) / 1000;
-            document.getElementById('resultado-js').innerText = result + '\nTiempo de ejecución: ' + timeJs + ' segundos';
-            resultadosJs.push(timeJs);
-            myChart.update();
-        };
-    </script>
     <h1>Gráfico de Resultados</h1>
     <canvas id="myChart" width="400" height="200"></canvas>
     <script>
