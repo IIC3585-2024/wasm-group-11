@@ -38,7 +38,7 @@
             labels = [];
 
             // Ejecutar las funciones 100 veces
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 20; i++) {
                 // Ejecutar la función de WebAssembly
                 const numero = document.getElementById('numero').value;
                 const startWasm = performance.now();
@@ -46,15 +46,16 @@
                 const endWasm = performance.now();
                 const timeWasm = (endWasm - startWasm) / 1000;
                 resultadosWasm.push(timeWasm);
+                console.log(timeWasm);
                 labels.push(i);
 
-                // Ejecutar la función de JavaScript
-                const startJs = performance.now();
-                const result = factorizacionPrima(numero);
-                const endJs = performance.now();
-                const timeJs = (endJs - startJs) / 1000;
-                resultadosJs.push(timeJs);
-                console.log('Iteración', i);
+                // // Ejecutar la función de JavaScript
+                // const startJs = performance.now();
+                // const result = factorizacionPrima(numero);
+                // const endJs = performance.now();
+                // const timeJs = (endJs - startJs) / 1000;
+                // resultadosJs.push(timeJs);
+                // console.log('Iteración', i);
             }
 
             // Actualizar el gráfico
