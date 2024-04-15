@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAssembly G11</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div><h1>Tarea 2: WASM</h1></div>
+
+        <br>
+
+        <div class="row g-3">
+            <input type="number" class="form-control col-3" style="font-size: 25px;" id="numeroInput" placeholder="Ingrese un número entero">
+    
+            <button class="btn btn-primary btn-lg" onclick="ejecutarFunciones()">Ejecutar funciones</button>
+            <button class="btn btn-primary btn-lg" onclick="clearChart()">Resetear gráfico</button>
+        </div>
+
+
+        <br>
+
+        <div>
+            <h4 id="estado" class="alert alert-warning"></h4>
+        </div>
+        
+        <div>
+            <h3>Resultado con wasm sin optimización</h3>
+            <h4 id="resultado-wasm"></h4>
+        </div>
+
+        <div>
+            <h3>Resultado con javascript</h3>
+            <h4 id="resultado-js"></h4>
+        </div>
+    </div>
+
+
+    <script src="./js_factorizacion.js"></script>
+    <script src="./factorizacion.js"></script>
+    <script>
+        let resultadosWasm = [];
+        let resultadosJs = [];
+        let labels = [];
+
+        function clearChart() {
+            resultadosWasm = [];
+            resultadosJs = [];
+            labels = [];
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = resultadosWasm;
+            myChart.data.datasets[1].data = resultadosJs;
+            myChart.update();
+        }
+
+        function ejecutarWasm() {
+            let numeroWASM = document.getElementById('numeroInput').value;
+            if (numeroWASM !== "") {
+                const startWasm = performance.now();
+                const resultado_ptr = Module.ccall('factorizacionPrima', 'number', ['string'], [numeroWASM.toString()]);
+                const endWasm = performance.now();
+                const result = Module.UTF8ToString(resultado_ptr);
+                const timeWasm = (endWasm - startWasm) / 1000;
+                document.getElementById('resultado-wasm').innerText = result + '\nTiempo de ejecución: ' + timeWasm + ' segundos'; 
+                resultadosWasm.push(timeWasm);
+                labels.push(resultadosWasm.length);
+                myChart.update();
+            }
+            else {
+                document.getElementById('resultado-wasm').innerText = 'Por favor ingrese un número';
+            }
+        }
+
+        function ejecutarJs() {
+            let numeroJS = document.getElementById('numeroInput').value;
+            if (numeroJS !== "") {
+                const startJs = performance.now();
+                const result = factorizacionPrima(numeroJS);
+                const endJs = performance.now();
+                const timeJs = (endJs - startJs) / 1000;
+                document.getElementById('resultado-js').innerText = result + '\nTiempo de ejecución: ' + timeJs + ' segundos';
+                resultadosJs.push(timeJs);
+                myChart.update();
+            }
+            else {
+                document.getElementById('resultado-js').innerText = 'Por favor ingrese un número';
+            }
+        }
+
+        function ejecutarFunciones() {
+            document.getElementById('estado').innerText = 'Cargando...';
+            setTimeout(function() {
+                let numero = document.getElementById('numeroInput').value;
+                if (numero !== "") {
+                    ejecutarWasm();
+                    ejecutarJs();
+                    document.getElementById('estado').innerText = 'Funciones ejecutadas con éxito!!';
+                }
+                else {
+                    document.getElementById('estado').innerText = 'Por favor ingrese un número';
+                }
+            }, 100);
+        }
+    </script>
+    <div class="container mt-5">
+        <h1>Gráfico de Resultados</h1>
+    <canvas id="myChart" width="400" height="200"></canvas>
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Wasm',
+                    data: resultadosWasm,
+                    fill: false,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }, {
+                    label: 'Javascript',
+                    data: resultadosJs,
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>    
+    </div>
+</body>
+</html>
