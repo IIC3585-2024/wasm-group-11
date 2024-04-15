@@ -17,4 +17,5 @@ limpiar cache de emcc
 - ``emcc --clear-cache``
 
 Bibliografia extra a la de canvas:
-https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#interacting-with-code-ccall-cwrap
+- https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#interacting-with-code-ccall-cwrap
+- https://emscripten.org/docs/tools_reference/emcc.html
